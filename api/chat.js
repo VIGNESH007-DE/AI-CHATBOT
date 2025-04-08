@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer sk-proj-your-actual-key-here`, // 🛑 Replace this with your real API key
+        Authorization: `Bearer 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`, // 🛑 Replace this with your real API key
         'HTTP-Referer': 'https://ai-chatbot-pi-mocha-15.vercel.app/',
         'X-Title': 'WSP ChatBot',
         'Content-Type': 'application/json',
