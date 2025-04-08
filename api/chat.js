@@ -1,39 +1,41 @@
+// /api/chat.js
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Only POST allowed' });
+    return res.status(405).json({ error: 'Only POST method allowed' });
   }
 
-  const userMessage = req.body.message;
+  const { message } = req.body;
+
+  if (!message) {
+    return res.status(400).json({ error: 'Message is required' });
+  }
 
   try {
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        Authorization: `Bearer sk-proj-your-actual-key-here`, // 🛑 Replace this with your real API key
         'HTTP-Referer': 'https://ai-chatbot-pi-mocha-15.vercel.app/',
         'X-Title': 'WSP ChatBot',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'deepseek/deepseek-chat',
-        messages: [{ role: 'user', content: userMessage }],
+        model: 'openai/gpt-3.5-turbo',
+        messages: [{ role: 'user', content: message }],
       }),
     });
 
-    const text = await response.text();
-    let data;
+    const data = await response.json();
 
-    try {
-      data = JSON.parse(text);
-    } catch (err) {
-      console.error('Invalid JSON:', text);
-      return res.status(500).json({ error: 'Invalid JSON from OpenRouter' });
+    if (!response.ok) {
+      return res.status(response.status).json({ error: data });
     }
 
-    res.status(200).json(data);
+    return res.status(200).json(data);
   } catch (err) {
-    console.error('Fetch failed:', err);
-    res.status(500).json({ error: 'Failed to fetch from OpenRouter' });
+    return res.status(500).json({ error: 'Failed to fetch from OpenRouter API' });
   }
 }
+
 
